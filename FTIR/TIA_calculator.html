@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TIF calculator</title>
+    <style>
+        body { font-family: Comic Sans Ms; background-color: yellow;}
+        section { border-radius: 5px; box-shadow: 5px 3px; margin: 10px; padding: 10px; background-color: lime;}
+        form { padding: 10px; }
+        fieldset { border-color: orange; }
+        table { border-collapse: collapse; }
+        td, th { border: 2px solid yellow; padding: 5px; }
+    </style>
+</head>
+<body>
+    <section>
+        <img src="https://web.archive.org/web/20091021145457/http://www.geocities.com/cfishawk/calculator.gif" alt="" style="float:right; margin-right: 10%;">
+        <h1>Welcome to the Trans Impedance Amplifier Calculator!</h1>
+        <h3>Plug in your values and cross your fingers Adam did his math right</h3>
+    </section>
+    <div style="background-color: blue;">
+        <img src="https://web.archive.org/web/20090829220712/http://geocities.com/Area51/Station/2639/gifs/movingelectricbar.gif" alt="" style="width:100%;height:30px;">
+    </div>
+    <section>
+        <form id="frm" onsubmit="calculate()">
+            <fieldset>
+                <legend>Ranges</legend>
+                <label for="vmax">Max Voltage:</label>
+                <input id="vmax" type="number" value="3.3" step="any"/> <br/>
+                <label for="vmin">Min Voltage (Vref):</label> 
+                <input id="vmin" type="number" value="0.1" step="any"/> <br/>
+                <!--<label for="vs">Source Voltage+:</label> 
+                <input id="vs" type="number" value="3.3" step="any"/> <br/>
+                <label for="vsn">Source Voltage-:</label> 
+                <input id="vsn" type="number" value="0.1" step="any"/> <br/>-->
+
+                <label for="imax">Max Photodiode Current (uA):</label> 
+                <input id="imax" type="number" value="32" step="any"/> <br/>
+            </fieldset>
+            <fieldset>
+                <legend>Stupid Ass Noise</legend>
+                <!--<label for="rsh">Photodiode Shunt Resistance (kOhm):</label> 
+                <input id="rsh" type="number" value="8.3" step="any"/> <br/>-->
+                <label for="cpd">Photodiode (Terminal) Capacitance (pF):</label>
+                <input id="cpd" type="number" value="0.8" step="any"/> <br/>
+                <label for="ccm">Common Mode Capacitatance (pF):</label> 
+                <input id="ccm" type="number" value="2" step="any"/> <br/>
+                <label for="cdiff">Differential Capacitatance (pF):</label> 
+                <input id="cdiff" type="number" value="3" step="any"/> <br/>
+
+                <label for="gbwp">Gain-Bandwidth Product (GBWP) (MHz):</label> 
+                <input id="gbwp" type="number" value="7" step="any"/> <br/>
+            </fieldset>
+            <input type="submit" value="Calculate"/>
+        </form>
+    </section>
+    <section id="result-container" hidden>
+        <h1>Your result is:</h1>
+        <table id="result">
+            <tr>
+                <th>Quantity</th>
+                <th>Value</th>
+                <th>Units</th>
+            </tr>
+            <tr>
+                <td>Resistor</td>
+                <td id="rf"></td>
+                <td>kOhm</td>
+            </tr>
+            <tr>
+                <td>Capacitor</td>
+                <td id="cf"></td>
+                <td>pF</td>
+            </tr>
+        </table>
+    </section>
+    <script>
+        function $(id){
+            return document.getElementById(id);
+        }
+        function $v(id){
+            return $(id).value;
+        }
+        let form = $("frm");
+        let result = $("result");
+        let result_container = $("result-container");
+        form.addEventListener( "submit", e => e.preventDefault() );
+        function calculate() {
+            if(result_container.hidden) {
+                result_container.hidden = false;
+            }
+            let vrange = +$v("vmax") - +$v("vmin");
+            let rf = vrange / (+$v("imax") * 1e-6) / 1e3; //killiohms
+
+            let cin = +$v("cpd") + +$v("ccm") + +$v("cdiff"); //picofarads
+            let cf = Math.sqrt( cin * 1e-12 / ( 2 * Math.PI * +$v("gbwp") * 1e6 * rf * 1e3 ) ) * 1e12;
+            $("rf").innerHTML = rf;
+            $("cf").innerHTML = cf;
+        }
+    </script>
+</body>
+</html>
