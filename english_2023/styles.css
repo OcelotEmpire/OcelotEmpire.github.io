@@ -1,0 +1,68 @@
+:root {
+    --bg-color-light: #EEF0F2;
+    --bg-color-less-dark: #011638;
+    --bg-color-dark: #141414;
+    --accent-color-primary: #DF2935;
+    --accent-color-secondary: #EEC643;
+    --accent-color-tertiary: #0D21A1;
+}
+
+.container {
+    padding: 30px;
+}
+body {
+    font-family: Verdana;
+    /*overflow:hidden;*/
+    background-color: var(--bg-color-dark);
+}
+section {
+    margin: 0px;
+}
+.slide-container{
+    overflow: hidden;
+    height: 300px;
+    padding: 10px;
+    display: flex;
+    background-color: var(--bg-color-less-dark);
+}
+.slide {
+    width: 200px;
+    height: 200px;
+    margin: 10px;
+    box-shadow: 0px 15px 10px black;
+    background-color: var(--bg-color-light);
+}
+.slide-banner {
+    background-image: linear-gradient(rgba(0, 0, 0, 0), var(--accent-color-tertiary));
+    height: 25%;
+    color: var(--bg-color-light);
+    text-align: left;
+}
+.slide-contents {
+    padding: 20px;
+    color: var(--bg-color-dark);
+    text-align: center;
+}
+#banner {
+    background-image: url("banner.png");
+    background-size: cover;
+    height: 300px;
+}
+#title {
+    font-size: 72px;
+    z-index: 10;
+    text-shadow: 0 0 10px var(--bg-color-dark);
+}
+#intro {
+    background-color: var(--bg-color-dark);
+    color: var(--bg-color-light);
+}
+#main {
+    background-color: var(--bg-color-dark);
+    color: var(--accent-color-secondary);
+    /*-webkit-clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 25%, calc(100% - 10px) 0);
+    clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 25%, calc(100% - 10px) 0);*/
+    
+    box-shadow: 0 -30px 25px 0px var(--bg-color-dark);
+    z-index: 5;
+}
