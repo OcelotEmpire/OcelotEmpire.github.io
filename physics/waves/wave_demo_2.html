@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wavelength and Period</title>
+    <style>
+        canvas {
+            border: 2px solid black;
+            width: 80vw;
+        }
+        table {
+            border: 2px solid black;
+            text-align: center;
+            padding: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h1 style="text-align: center;">Wavelength and Period</h1>
+    <p>
+        Let's look at two pictures of a wave. In one we'll plot y as a function of x, set the wave going 
+        and then hit the pause button. This is like taking a photograph of the wave, so we freeze it at one instant 
+        in time.
+    </p>
+    <p>
+        What is the wavelength of our wave? It's the distance between two particles that are 2&pi; out of phase 
+        with one another. For instance, it's the distance between one peak and the next.
+    </p>
+    <p>
+        In our other view we'll focus on the motion of a single particle, plotting y as a function of time.
+        Again look at two particles that are 2&pi; out of phase with one another. Here the "distance" between 
+        them has units of time - it's the period of the wave.
+    </p>
+    <div style="text-align: center;">
+        <table>
+            <tr>
+                <td>
+                    <canvas id="display1"></canvas>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <canvas id="display2"></canvas>
+                </td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>
