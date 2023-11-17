@@ -47,10 +47,10 @@ function drawGrid() {
     ctx.stroke();
 
 }
-const numTransverse = 80
-const transverseSpacing = gridSize / 10;
-const transverseStartX = 2, transverseStartY = 2;
-const amplitude = 1, wavelength = 4;
+const numTransverse = 80;
+const transverseSpacing = gridSize / 10; //px
+const transverseStartX = 2, transverseStartY = 2; //grid
+const amplitude = 1, wavelength = 4; //grid
 const k= 2 * Math.PI / (gridSize * wavelength), v=800, omega = v*k;
 
 const pointRadius = 0.08*gridSize;
@@ -74,11 +74,11 @@ function drawTransverse() {
     }
     
 }
-const numLongitudinal = 40
-const numRowsLongitudinal = 5;
-const longitudinalSpacingX = gridSize / 5, longitudinalSpacingY = gridSize * 0.2;
-const longitudinalStartX = 2, longitudinalStartY = 4.5;
-const longitudinalStretch = 0.4;
+const numLongitudinal = 40;
+const numRowsLongitudinal = 5; //grid
+const longitudinalSpacingX = gridSize / 5, longitudinalSpacingY = gridSize * 0.2; //px
+const longitudinalStartX = 2, longitudinalStartY = 4.5; //grid
+const longitudinalStretch = 0.4; //grid
 function drawLongitudinal() {
     for(let row=0; row<numRowsLongitudinal; row++){
         for(let i=0; i<numLongitudinal; i++){
@@ -155,7 +155,7 @@ function pause() {
     }
 
 }
-var stepSize = 20
+var stepSize = 50;
 function stepForward() {
     time += stepSize;
     draw();

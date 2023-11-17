@@ -11,12 +11,32 @@
         }
         table {
             border: 2px solid black;
-            text-align: center;
+            margin: 20px auto;
             padding: 2px;
+        }
+        #home {
+            float:left;
+            background-image: url("home_still.png");
+            width: 60px;
+            height: 45px;
+        }
+        #home:hover {
+            background-image: url("home_moving.gif");
+        }
+        button{
+            display: inline-block;
+        }
+        button:active{
+            background-color: skyblue;
+        }
+        footer {
+            position: fixed;
+            bottom: 0px;
         }
     </style>
 </head>
 <body>
+    <a id="home" href="index.html"></a>
     <h1 style="text-align: center;">Wavelength and Period</h1>
     <p>
         Let's look at two pictures of a wave. In one we'll plot y as a function of x, set the wave going 
@@ -32,19 +52,32 @@
         Again look at two particles that are 2&pi; out of phase with one another. Here the "distance" between 
         them has units of time - it's the period of the wave.
     </p>
+    <noscript>Please enable JavaScript!</noscript>
     <div style="text-align: center;">
         <table>
             <tr>
                 <td>
-                    <canvas id="display1"></canvas>
+                    <canvas id="wave-display"></canvas>
                 </td>
             </tr>
             <tr>
                 <td>
-                    <canvas id="display2"></canvas>
+                    <canvas id="graph-display"></canvas>
                 </td>
             </tr>
         </table>
     </div>
+    <div style="text-align: center;">
+        <button id="start">play</button>
+        <button id="pause">pause</button>
+        <button id="step-back">&lt;&lt;step</button>
+        <button id="step-forward">step>></button>
+        <button id="reset">reset</button>
+    </div>
+    <br>
+    <footer>
+        <small>Based on an applet by webphysics.davidson.edu</small>
+    </footer>
+    <script src="wave_demo_2.js"></script>
 </body>
 </html>
