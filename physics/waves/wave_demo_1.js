@@ -83,10 +83,10 @@ function drawLongitudinal() {
     for(let row=0; row<numRowsLongitudinal; row++){
         for(let i=0; i<numLongitudinal; i++){
 
-            if(i == 10) ctx.fillStyle = 'black';
-            else if(i == 15) ctx.fillStyle = '#00ff00';
-            else if(i == 20) ctx.fillStyle = '#0000ff';
-            else if(i == 50) ctx.fillStyle = 'black';
+            if(i == 5) ctx.fillStyle = 'black';
+            else if(i == 10) ctx.fillStyle = '#00ff00';
+            else if(i == 15) ctx.fillStyle = '#0000ff';
+            else if(i == 25) ctx.fillStyle = 'black';
             else ctx.fillStyle = 'magenta';
     
             let x = longitudinalStartX*gridSize + gridOffset + longitudinalSpacingX*i;
