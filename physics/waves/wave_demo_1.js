@@ -51,14 +51,15 @@ const numTransverse = 80
 const transverseSpacing = gridSize / 10;
 const transverseStartX = 2, transverseStartY = 2;
 const amplitude = 1, wavelength = 4;
-const k= 2 * Math.PI / (gridSize * wavelength), v=1000, omega = v*k;
+const k= 2 * Math.PI / (gridSize * wavelength), v=800, omega = v*k;
+
+const pointRadius = 0.08*gridSize;
 function drawTransverse() {
-    let r= 0.07*gridSize;
     for(let i=0; i<numTransverse; i++){
 
         if(i == 10) ctx.fillStyle = 'black';
-        else if(i == 15) ctx.fillStyle = 'green';
-        else if(i == 20) ctx.fillStyle = 'blue';
+        else if(i == 15) ctx.fillStyle = '#00ff00';
+        else if(i == 20) ctx.fillStyle = '#0000ff';
         else if(i == 50) ctx.fillStyle = 'black';
         else ctx.fillStyle = 'red';
 
@@ -68,13 +69,35 @@ function drawTransverse() {
         //y += (amplitude*gridSize) * Math.sin(k * x) * Math.cos(omega * time/1000);
         y += (amplitude*gridSize) * Math.sin(k * x - omega * time/1000)
         ctx.beginPath();
-        ctx.arc(x, y, r, 0, 2*Math.PI);
+        ctx.arc(x, y, pointRadius, 0, 2*Math.PI);
         ctx.fill();
     }
     
 }
+const numLongitudinal = 40
+const numRowsLongitudinal = 5;
+const longitudinalSpacingX = gridSize / 5, longitudinalSpacingY = gridSize * 0.2;
+const longitudinalStartX = 2, longitudinalStartY = 4.5;
+const longitudinalStretch = 0.4;
 function drawLongitudinal() {
+    for(let row=0; row<numRowsLongitudinal; row++){
+        for(let i=0; i<numLongitudinal; i++){
 
+            if(i == 10) ctx.fillStyle = 'black';
+            else if(i == 15) ctx.fillStyle = '#00ff00';
+            else if(i == 20) ctx.fillStyle = '#0000ff';
+            else if(i == 50) ctx.fillStyle = 'black';
+            else ctx.fillStyle = 'magenta';
+    
+            let x = longitudinalStartX*gridSize + gridOffset + longitudinalSpacingX*i;
+            let y = longitudinalStartY*gridSize + gridOffset + longitudinalSpacingY*row;
+            x += (longitudinalStretch*gridSize) * Math.sin(k * x - omega * time/1000)
+            ctx.beginPath();
+            ctx.arc(x, y, pointRadius, 0, 2*Math.PI);
+            ctx.fill();
+        }
+    }
+    
 }
 function drawWaves() {
     drawTransverse();
@@ -84,7 +107,7 @@ function drawHud() {
     ctx.fillStyle = '#000000';
     ctx.font = 'Bold 48pt Calibri';
     ctx.textBaseline = 'top';
-    ctx.fillText(`Time:   ${time / 1000}`, 10, 10);
+    ctx.fillText(`Time:   ${(time / 1000).toFixed(2)}`, 10, 10);
 }
 function draw() {
     clear();
@@ -98,7 +121,7 @@ function update() {
 
 const frameTime = 50;
 var run = function() {
-    update();
+    //update();
     draw();
     time += frameTime
     if(running){
@@ -127,15 +150,19 @@ function pause() {
         enableButton(stepForwardButton);
         running = false;
         console.log('stopping...')
+
+        draw();
     }
 
 }
-var stepSize = 500
+var stepSize = 20
 function stepForward() {
     time += stepSize;
+    draw();
 }
 function stepBack() {
     time -= stepSize;
+    draw();
 }
 function reset() {
     running = false;
