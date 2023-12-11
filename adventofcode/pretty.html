@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prettify</title>
+</head>
+<body>
+    <style>
+        body {
+            font-family:'Courier New', Courier, monospace;
+            background-color: black;
+        }
+        pre {
+            margin: 0 0;
+            white-space: pre;
+            text-wrap: nowrap;
+            color: darkslategray;
+        }
+        #title {
+            color: gold;
+            text-align: center;
+        }
+        #display {
+            padding: 0;
+            overflow-y: auto;
+            text-wrap: nowrap;
+            text-align: left;
+        }
+        #wrapper {
+            display: flex;
+            justify-content: center;
+        }
+        .wet {
+            color: blue;
+            font-weight: bold;
+        }
+    </style>
+    <h1 id="title">* * * Advent of Code Day 10 Visualizer * * *</h1>
+    <div id="wrapper">
+        <div id="display"></div>
+    </div>
+    <script type="text/javascript" src="pretty_area.js"></script>
+</body>
+</html>
