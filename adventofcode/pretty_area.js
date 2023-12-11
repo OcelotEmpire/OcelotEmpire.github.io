@@ -52,8 +52,8 @@ function initGrid() {
             grid.push(emptyRow);
         }
     }
-    for(let row=0; row<grid.length - 1; row++) { // generate new pipes
-        for(let col=0; col<grid[0].length - 1; col++) {
+    for(let row=0; row<grid.length; row++) { // generate new pipes
+        for(let col=0; col<grid[0].length; col++) {
             if(row%2 == 0 && col%2 == 1) { // ==
                 let left = grid[row][col-1];
                 let right = grid[row][col+1];
