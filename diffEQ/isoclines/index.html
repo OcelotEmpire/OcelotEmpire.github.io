@@ -11,18 +11,30 @@
 			font-family: Comic Sans MS;
 			padding: 20px;
 		}
-		div {
+		div.container {
 			padding: 10px;
+		}
+		.terminal {
+			/*
+			background-color: black;
+			color: lime;
+			*/
+			font-family: consolas;
+			font-weight: bold;
+			padding: .5em;
 		}
 		canvas {
 			border: 2px solid black;
 		}
 	</style>
-    <div>
+    <div class="container">
         <form onsubmit="draw()">
             <fieldset>
-                <label for="equation">equation: </label>
-                <input id="equation" type="text" value="(x+t) * Math.tan(t*x)">
+                <label>equation: </label><br>
+				<div class="terminal">
+					<label for="equation">dx/dt = </label>
+					<input id="equation" class="terminal" type="text" value="(x+t) * Math.tan(t*x)">
+				</div>
                 <input type="submit" name="equation" value="Draw">
             </fieldset>
             <fieldset>
@@ -46,7 +58,7 @@
             </fieldset>
         </form>
     </div>
-    <div>
+    <div class="container">
         <canvas></canvas>
     </div>
     <script>
