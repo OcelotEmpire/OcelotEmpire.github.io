@@ -1,0 +1,10 @@
+body {
+    font-family: Comic Sans MS;
+    padding: 20px;
+}
+div {
+    padding: 10px;
+}
+canvas {
+    border: 2px solid black;
+}

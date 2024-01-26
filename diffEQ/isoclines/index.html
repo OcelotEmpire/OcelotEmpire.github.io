@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isoclines</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div>
+        <form onsubmit="draw()">
+            <fieldset>
+                <label for="equation">equation: </label>
+                <input id="equation" type="text" value="(x+t) * Math.tan(t*x)">
+                <input type="submit" name="equation" value="Draw">
+            </fieldset>
+            <fieldset>
+                <legend>settings</legend>
+                <label for="g-spacing">grid lines wide: </label>
+                <input type="number" name="g-spacing" id="g-spacing" value="14">
+                <br>
+                <label for="t-spacing">ticks per grid cell: </label>
+                <input type="number" name="t-spacing" id="t-spacing" value="5">
+                <br>
+                <label for="t-length">tick length: </label>
+                <input type="number" name="t-length" id="t-length" value="20">
+                <br>
+                <label for="t-color">tick color: </label>
+                <select name="t-color" id="t-color">
+                    <option value="red">red</option>
+                    <option value="green">green</option>
+                    <option value="blue" selected>blue</option>
+                </select>
+                <br>
+            </fieldset>
+        </form>
+    </div>
+    <div>
+        <canvas></canvas>
+    </div>
+    <script>
+        document.querySelectorAll('form').forEach((frm)=>frm.addEventListener('submit', (e)=>e.preventDefault()));
+        let equationEl = document.getElementById("equation");
+        var width = 700, height = 700;
+        let canvas = document.querySelector("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        let ctx = canvas.getContext('2d');
+        
+        var gridSpacing = 50, tickLength = 20, ticksPerGrid = 5;
+        var tickColor = 'blue';
+        
+        function draw() {
+            updateSettings();
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, width, height);
+            drawGrid();
+            ctx.strokeStyle = tickColor;
+            ctx.lineWidth = 2;
+            let equation = equationEl.value;
+            ctx.beginPath();
+            for(let _x = 0; _x < height / gridSpacing; _x += 1/ticksPerGrid) {
+                for(let _t = 0; _t < width / gridSpacing; _t += 1/ticksPerGrid) {
+                    let x = _x, t = _t;
+                    let slope = eval(equation);
+                    drawSlope(slope, t, x);
+                    x = -_x; t = _t;
+                    slope = eval(equation);
+                    drawSlope(slope, t, x);
+                    x = -_x; t = -_t;
+                    slope = eval(equation);
+                    drawSlope(slope, t, x);
+                    x = _x; t = -_t;
+                    slope = eval(equation);
+                    drawSlope(slope, t, x);
+                }
+            }
+            ctx.stroke();
+        }
+        function drawGrid() {
+            ctx.strokeStyle = '#d1d1d1';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            for(let i=1; i<width / gridSpacing; i++) {
+                ctx.moveTo(width/2 + i*gridSpacing, 0);
+                ctx.lineTo(width/2 + i*gridSpacing, height);
+                ctx.moveTo(width/2 - i*gridSpacing, 0);
+                ctx.lineTo(width/2 - i*gridSpacing, height);
+            }
+            for(let i=1; i<height / gridSpacing; i++) {
+                ctx.moveTo(0,     height/2 - i*gridSpacing);
+                ctx.lineTo(width, height/2 - i*gridSpacing);
+                ctx.moveTo(0,     height/2 + i*gridSpacing);
+                ctx.lineTo(width, height/2 + i*gridSpacing);
+            }
+            ctx.stroke();
+
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            ctx.moveTo(width/2, 0);
+            ctx.lineTo(width/2, height);
+            ctx.moveTo(0, height/2);
+            ctx.lineTo(width, height/2);
+            ctx.stroke();
+        }
+        function drawSlope(slope, x, y) {
+            let mag = Math.sqrt(slope*slope + 1);
+            let w = 1/mag * tickLength, h = slope/mag * tickLength;
+            //ctx.beginPath();
+            ctx.moveTo(width/2 + x * gridSpacing - w/2, height/2 - y * gridSpacing + h/2);
+            ctx.lineTo(width/2 + x * gridSpacing + w/2, height/2 - y * gridSpacing - h/2);
+            //ctx.stroke();
+        }
+        function updateSettings() {
+            gridSpacing = width / +document.getElementById('g-spacing').value;
+            ticksPerGrid = +document.getElementById('t-spacing').value;
+            tickLength = +document.getElementById('t-length').value;
+            tickColor = document.getElementById('t-color').value;
+            canvas.width = width;
+            canvas.height = height;
+        }
+    </script>
+</body>
+</html>
