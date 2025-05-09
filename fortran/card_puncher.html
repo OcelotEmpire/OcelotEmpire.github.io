@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Puncher</title>
+
+    <style type="text/css" media="screen">
+        body {
+            background-color: navajowhite;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            padding: 0;
+        }
+        .side-by-side {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        @media (width <= 1250px) {
+            .side-by-side {
+                flex-direction: column;
+                width: 100%;
+            }
+        }
+
+        #editor {
+            display: block;
+            flex-grow: 1;
+            height: 30vh;
+            width: 100%;
+        }
+        #editor-container {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-width: 50%;
+        }
+        #punch-card-container {
+            position: relative;
+            text-align: center;
+            background-color: tan;
+            overflow: auto;
+            /* box-shadow:
+            inset 0 10px 10px navajowhite,
+            inset 0 -10px 10px navajowhite; */
+        }
+        #punch-card-area {
+            width: 100%;
+            height: 100%;
+            overflow-y: scroll;
+        }
+        #punch-card-area::before, #punch-card-area::after {
+            content: "";
+            display: inline-block;
+            height: 5%;
+            width: 100%;
+            z-index: 2;
+        }
+        #punch-card-area::before {
+            background: linear-gradient(navajowhite, transparent);
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        #punch-card-area::after {
+            background: linear-gradient(transparent, navajowhite);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+        #punch-card-area > svg {
+            max-width: 90vw;
+        }
+        #punch-card-area > svg:nth-of-type(1) {
+            margin-top: 5%;
+        }
+        #punch-card-area > svg:nth-last-of-type(1) {
+            margin-bottom: 5%;
+        }
+        @media (width > 1250px) {
+            #punch-card-container {
+                height: 100%;
+            }
+        }
+
+        #close-card-area {
+            width: 5em;
+            height: 5em;
+            background-image: url(https://t3.ftcdn.net/jpg/13/89/94/94/360_F_1389949445_FCX8751XbzadLC5UPrdh92PaU9Gw28Cv.jpg);
+            background-size: contain;
+            z-index: 3;
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+
+
+        .button {
+            display: inline-block;
+            color: #fff;
+            text-shadow: 0 0 2px rgba(0,0,0,.3);
+            font-family: Copperplate, Papyrus, fantasy;
+            box-shadow:
+                inset 0 0 2px 0 rgba(255,255,255,.4),
+                inset 0 0 3px 0 rgba(0,0,0,.4),
+                inset 0 0 3px 5px rgba(0,0,0,.05),
+                2px 2px 4px 0 rgba(0,0,0,.25);
+            border-radius: 4px;
+            padding: 8px 16px;;
+            font-size: 12px;
+            line-height: 14px;
+            position: relative;
+        }
+        .button.red { background: #EA3D33; }
+        .button.green { background: #7ED321; }
+        .button.blue { background: #4A90E2; }
+        .button:before, .button:after {
+            content: '';
+            display: block;
+            position: absolute;
+            left: 2px;
+            right: 2px;
+            height: 3px;
+        }
+        .button:before {
+            top: 0;
+            border-bottom-left-radius: 4px;
+            border-bottom-right-radius: 4px;
+            background: rgba(255,255,255,.6);
+            box-shadow: 0 1px 2px 0 rgba(255,255,255,.6);
+        }
+        .button:after {
+            bottom: 0;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+            background: rgba(0,0,0,.15);
+            box-shadow: 0 -1px 2px 0 rgba(0,0,0,.15);
+        }
+        .button:hover {
+            filter: brightness(120%);
+        }
+        .button:active {
+            filter: brightness(50%);
+        }
+
+    </style>
+    <script rel="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.41.0/ace.min.js"></script>
+</head>
+<body>
+    <div class="side-by-side">
+        <div id="editor-container">
+            <fieldset>
+                <legend>Punch Card Options</legend>
+                <label for="standard">Punch Card Standard</label>
+                <select name="standard">
+                    <option value="ibm-029">IBM 029</option>
+                </select>
+                <div>
+                    
+                </div>
+                <button type="button" onclick="printCode()" class="button green" style="float:right;">PREVIEW</button>
+                <button type="button" onclick="printCode()" class="button red" style="float:right;margin-right:5px;">PRINT</button>
+            </fieldset>
+            <code id="editor"></code>
+        </div>
+        <div id="punch-card-container">
+            <div id="close-card-area" onclick="closeCardArea()" style="display:none"></div>
+            <div id="punch-card-area">
+                <!-- svg goes here -->
+            </div>
+        </div>
+    </div>
+    <script>
+        // 029  &-0123456789ABCDEFGHIJKLMNOPQR/STUVWXYZ:#@'="¢.<(+|!$*);¬ ,%_>?
+        const standards = {
+            "ibm-029": {
+                "&": 0b100000000000,
+                "-": 0b010000000000,
+                "0": 0b001000000000,
+                "1": 0b000100000000,
+                "2": 0b000010000000,
+                "3": 0b000001000000,
+                "4": 0b000000100000,
+                "5": 0b000000010000,
+                "6": 0b000000001000,
+                "7": 0b000000000100,
+                "8": 0b000000000010,
+                "9": 0b000000000001,
+                "A": 0b100100000000,
+                "B": 0b100010000000,
+                "C": 0b100001000000,
+                "D": 0b100000100000,
+                "E": 0b100000010000,
+                "F": 0b100000001000,
+                "G": 0b100000000100,
+                "H": 0b100000000010,
+                "I": 0b100000000001,
+                "J": 0b010100000000,
+                "K": 0b010010000000,
+                "L": 0b010001000000,
+                "M": 0b010000100000,
+                "N": 0b010000010000,
+                "O": 0b010000001000,
+                "P": 0b010000000100,
+                "Q": 0b010000000010,
+                "R": 0b010000000001,
+                "/": 0b001100000000,
+                "S": 0b001010000000,
+                "T": 0b001001000000,
+                "U": 0b001000100000,
+                "V": 0b001000010000,
+                "W": 0b001000001000,
+                "X": 0b001000000100,
+                "Y": 0b001000000010,
+                "Z": 0b001000000001,
+                ":": 0b000010000010,
+                "#": 0b000001000010,
+                "@": 0b000000100010,
+                "'": 0b000000010010,
+                "=": 0b000000001010,
+                '"': 0b000000000110,
+                "₵": 0b100010000010,
+                ".": 0b100001000010,
+                "<": 0b100000100010,
+                "(": 0b100000010010,
+                "+": 0b100000001010,
+                "|": 0b100000000110,
+                "!": 0b010010000010,
+                "$": 0b010001000010,
+                "*": 0b010000100010,
+                ")": 0b010000010010,
+                ";": 0b010000001010,
+                "¬": 0b010000000110,
+                " ": 0b001010000010,
+                ",": 0b001001000010,
+                "%": 0b001000100010,
+                "_": 0b001000010010,
+                ">": 0b001000001010,
+                "?": 0b001000000110,
+            }
+        };
+
+        function renderCard(codeString, standard = "ibm-029") {
+            if (codeString.length > 80) {
+                codeString = codeString.substring(0, 80);
+            } else if (codeString.length < 80) {
+                codeString = codeString.padEnd(80, ' ');
+            }
+
+            if (!(standard in standards)) {
+                throw "Invalid standard!";
+            }
+            
+            const cardWidth = 7.375;
+            const cardHeight = 3.25;
+            const borderWidth = 0.05;
+            const cardMargin = 0.251;
+            const cutoutAngle = 60;
+            const margin = 0.1;
+            const columnWidth = 0.087;
+            const holeWidth = 0.056;
+            const holeHeight = 0.126;
+    
+            const xmlns = "http://www.w3.org/2000/svg";
+            const svg = document.createElementNS(xmlns, "svg");
+            svg.setAttribute("width", `${cardWidth + 2*margin}in`);
+            svg.setAttribute("height", `${cardHeight + 2*margin}in`);
+            svg.setAttribute("viewBox", `0 0 ${cardWidth + 2*margin} ${cardHeight + 2*margin}`);
+
+            // generate border
+
+            const container = document.createElementNS(xmlns, "g");
+            container.setAttribute("transform", `translate(${margin}, ${margin})`);
+            svg.appendChild(container);
+            const border = document.createElementNS(xmlns, "path");
+            border.setAttribute("d", ``
+                + `M ${cardMargin} 0`
+                + `H ${cardWidth-cardMargin}`
+                + `Q ${cardWidth} 0 ${cardWidth} ${cardMargin}`
+                + `V ${cardHeight-cardMargin}`
+                + `Q ${cardWidth} ${cardHeight} ${cardWidth-cardMargin} ${cardHeight}`
+                + `H ${cardMargin}`
+                + `Q 0 ${cardHeight} 0 ${cardHeight-cardMargin}`
+                + `V ${Math.tan(cutoutAngle*Math.PI/180)*cardMargin}`
+                + `Z`);
+            border.setAttribute("fill", "cornsilk");
+            border.setAttribute("stroke", "black");
+            border.setAttribute("stroke-width", borderWidth);
+            container.appendChild(border);
+
+            // create row groups
+
+            const rowHeight = cardHeight / 13;
+            const rowContainers = [];
+            for (let row = 0; row < 12; row++) {
+                const rowContainer = document.createElementNS(xmlns, "g");
+                rowContainer.setAttribute("transform", `translate(${cardMargin}, ${row*rowHeight + rowHeight/2})`)
+                rowContainer.setAttribute("font-family", "impact");
+                rowContainer.setAttribute("font-size", "0.12px");
+                rowContainer.setAttribute("text-anchor", "middle");
+                container.appendChild(rowContainer);
+                rowContainers.push(rowContainer);
+            }
+
+            // guide lines
+
+            /*for (let row = 0; row < 12; row++) {
+                const line = document.createElementNS(xmlns, "line");
+                line.setAttribute("x1", 0);
+                line.setAttribute("y1", (row+1)*rowHeight);
+                line.setAttribute("x2", cardWidth);
+                line.setAttribute("y2", (row+1)*rowHeight);
+                line.setAttribute("stroke", "black");
+                line.setAttribute("stroke-width", "0.02px");
+                container.appendChild(line);
+            }
+            for (let col = 0; col < 80; col++) {
+                const line = document.createElementNS(xmlns, "line");
+                line.setAttribute("x1", cardMargin+col*columnWidth);
+                line.setAttribute("y1", 0);
+                line.setAttribute("x2", cardMargin+col*columnWidth);
+                line.setAttribute("y2", cardHeight);
+                line.setAttribute("stroke", "black");
+                line.setAttribute("stroke-width", "0.02px");
+                container.appendChild(line);
+            }*/
+
+            // generate numbers
+
+            for (let row = 0; row < 10; row++) {
+                for (let col = 0; col < 80; col++) {
+                    const text = document.createElementNS(xmlns, "text");
+                    text.setAttribute("x", col*columnWidth);
+                    text.setAttribute("y", 0.17);
+                    text.innerHTML = row;
+                    rowContainers[row+2].appendChild(text);
+                }
+            }
+
+            function addColumnNumbers(position) {
+                const columnNumbers = document.createElementNS(xmlns, "g");
+                columnNumbers.setAttribute("transform", `translate(${cardMargin}, ${position})`);
+                columnNumbers.setAttribute("font-family", "impact");
+                columnNumbers.setAttribute("font-size", "0.08px");
+                columnNumbers.setAttribute("text-anchor", "middle");
+                for (let col = 0; col < 80; col++) {
+                    const text = document.createElementNS(xmlns, "text");
+                    text.setAttribute("x", col*columnWidth);
+                    text.innerHTML = col + 1;
+                    columnNumbers.appendChild(text);
+                }
+                container.appendChild(columnNumbers);
+            }
+
+            addColumnNumbers(3.55*rowHeight);
+            addColumnNumbers(12.55*rowHeight);
+
+            // generate the text on the top of the card
+
+            const readout = document.createElementNS(xmlns, "g");
+            readout.setAttribute("transform", `translate(${cardMargin}, ${0.5*rowHeight})`)
+            readout.setAttribute("font-family", "courier new");
+            readout.setAttribute("font-size", "0.12px");
+            readout.setAttribute("text-anchor", "middle");
+            for (let col = 0; col < 80; col++) {
+                const character = codeString[col];
+                if (character === ' ') continue;
+                const text = document.createElementNS(xmlns, "text");
+                text.setAttribute("x", col*columnWidth);
+                text.innerHTML = codeString[col];
+                readout.appendChild(text);
+            }
+            container.appendChild(readout);
+
+            // generate the holes in the card
+
+            const characterLookup = standards[standard]; 
+            for (let col = 0; col < 80; col++) {
+                const character = codeString[col];
+                if (character === ' ') continue;
+                const bitmask = characterLookup[character];
+                for (let b = 0; b < 12; b++) {
+                    if (bitmask & (0b100000000000 >> b)) {
+                        // create rectangle
+                        const hole = document.createElementNS(xmlns, "rect");
+                        hole.setAttribute("x", columnWidth*col - holeWidth/2);
+                        hole.setAttribute("y", (rowHeight-holeHeight)/2);
+                        hole.setAttribute("width", holeWidth);
+                        hole.setAttribute("height", holeHeight);
+                        rowContainers[b].appendChild(hole);
+                    }
+                }
+            }
+
+            svg.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:xlink", "http://www.w3.org/1999/xlink")
+            return svg;
+        }
+
+        const editor = ace.edit("editor", {
+            mode: "ace/mode/fortran",
+            theme: "ace/theme/solarized_light",
+        });
+
+        const exampleCode =
+`! PRINT THE FIRST 10 ROWS OF PASCAL'S TRIANGLE
+PROGRAM PASCAL
+    INTEGER, ALLOCATABLE :: ROW(:)
+    DO N = 1, 10
+        I = 1
+        ALLOCATE(ROW(N))
+        DO M = 1, N
+            ROW(M) = I
+            I = I * (N - M) / M
+        END DO
+        PRINT *, ROW
+        DEALLOCATE(ROW)
+    END DO
+END PROGRAM PASCAL`
+        editor.insert(exampleCode);
+        editor.gotoLine(1);
+
+        const punchCardArea = document.getElementById("punch-card-area");
+        const closeCardAreaButton = document.getElementById("close-card-area");
+
+        function printCode() {
+            punchCardArea.innerHTML = ""; // remove old cards
+            const codeString = editor.getValue();
+            let lineNumber = 1;
+            for (const line of codeString.split('\n')) {
+                if (line.trim() === "") continue;
+                const svg = renderCard(line.trim());
+                svg.setAttribute("id", `punch-card-line-${lineNumber++}`);
+                punchCardArea.appendChild(svg);
+            }
+            closeCardAreaButton.style.display = "";
+        }
+
+        function closeCardArea() {
+            punchCardArea.innerHTML = "";
+            closeCardAreaButton.style.display = "none";
+        }
+    </script>
+</body>
+</html>
